@@ -30,7 +30,7 @@ import de.caritas.cob.messageservice.generated.api.controller.MessagesApi;
 import io.swagger.annotations.Api;
 import java.time.Instant;
 import java.util.Optional;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -84,7 +84,7 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<Void> updateKey(@Valid @RequestBody MasterKeyDTO masterKey) {
+  public ResponseEntity<Void> updateKey(@Valid MasterKeyDTO masterKey) {
 
     if (!encryptionService.getMasterKey().equals(masterKey.getMasterKey())) {
       encryptionService.updateMasterKey(masterKey.getMasterKey());
@@ -105,9 +105,9 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<MessageResponseDTO> createMessage(@RequestHeader String rcToken,
-      @RequestHeader String rcUserId, @RequestHeader String rcGroupId,
-      @Valid @RequestBody MessageDTO message) {
+  public ResponseEntity<MessageResponseDTO> createMessage(String rcToken,
+      String rcUserId, String rcGroupId,
+      MessageDTO message) {
 
     var groupMessage = ChatMessage.builder()
         .rcToken(rcToken)
@@ -133,9 +133,9 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<MessageResponseDTO> forwardMessage(@RequestHeader String rcToken,
-      @RequestHeader String rcUserId, @RequestHeader String rcGroupId,
-      @Valid @RequestBody ForwardMessageDTO forwardMessageDTO) {
+  public ResponseEntity<MessageResponseDTO> forwardMessage(String rcToken,
+      String rcUserId, String rcGroupId,
+      ForwardMessageDTO forwardMessageDTO) {
 
     Optional<String> alias =
         JSONHelper.convertAliasMessageDTOToString(
@@ -164,9 +164,9 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<MessageResponseDTO> createFeedbackMessage(@RequestHeader String rcToken,
-      @RequestHeader String rcUserId, @RequestHeader String rcFeedbackGroupId,
-      @Valid @RequestBody MessageDTO message) {
+  public ResponseEntity<MessageResponseDTO> createFeedbackMessage(String rcToken,
+      String rcUserId, String rcFeedbackGroupId,
+      MessageDTO message) {
 
     var feedbackMessage = ChatMessage.builder()
         .rcToken(rcToken)
@@ -189,8 +189,8 @@ public class MessageController implements MessagesApi {
    *                            written in the alias object
    */
   @Override
-  public ResponseEntity<MessageResponseDTO> createVideoHintMessage(@RequestHeader String rcGroupId,
-      @Valid @RequestBody VideoCallMessageDTO videoCallMessageDTO) {
+  public ResponseEntity<MessageResponseDTO> createVideoHintMessage(String rcGroupId,
+      VideoCallMessageDTO videoCallMessageDTO) {
 
     var response = this.messenger.createVideoHintMessage(rcGroupId,
         videoCallMessageDTO);
@@ -206,8 +206,8 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<Void> saveDraftMessage(@RequestHeader String rcGroupId,
-      @Valid @RequestBody DraftMessageDTO message) {
+  public ResponseEntity<Void> saveDraftMessage(String rcGroupId,
+      DraftMessageDTO message) {
 
     SavedDraftType savedDraftType = this.draftMessageService.saveDraftMessage(message.getMessage(),
         rcGroupId, message.getT());
@@ -222,7 +222,7 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<DraftMessageDTO> findDraftMessage(@RequestHeader String rcGroupId) {
+  public ResponseEntity<DraftMessageDTO> findDraftMessage(String rcGroupId) {
     Optional<DraftMessageDTO> draftMessage = this.draftMessageService.findAndDecryptDraftMessage(
         rcGroupId);
     return draftMessage.map(ResponseEntity::ok)
@@ -238,8 +238,8 @@ public class MessageController implements MessagesApi {
    * @return {@link ResponseEntity} with the {@link HttpStatus}
    */
   @Override
-  public ResponseEntity<MessageResponseDTO> saveAliasOnlyMessage(@RequestHeader String rcGroupId,
-      @Valid AliasOnlyMessageDTO aliasOnlyMessageDTO) {
+  public ResponseEntity<MessageResponseDTO> saveAliasOnlyMessage(String rcGroupId,
+      AliasOnlyMessageDTO aliasOnlyMessageDTO) {
     var type = aliasOnlyMessageDTO.getMessageType();
     var aliasArgs = aliasOnlyMessageDTO.getArgs();
 
@@ -267,8 +267,10 @@ public class MessageController implements MessagesApi {
 
   private boolean hasMissingMandatoryAliasArgForReassignment(AliasArgs aliasArgs) {
     if (nonNull(aliasArgs)) {
-      return isNull(aliasArgs.getToConsultantId()) || isNull(aliasArgs.getFromConsultantName())
-          || isNull(aliasArgs.getToConsultantName()) || isNull(aliasArgs.getToAskerName());
+      return isNull(aliasArgs.getToConsultantId()) || isNull(
+          aliasArgs.getFromConsultantName())
+          || isNull(aliasArgs.getToConsultantName()) || isNull(
+          aliasArgs.getToAskerName());
     }
     return true;
   }
@@ -332,8 +334,8 @@ public class MessageController implements MessagesApi {
    */
   @Override
   public ResponseEntity<MessageResponseDTO> saveAliasMessageWithContent(
-      @RequestHeader String rcGroupId,
-      @Valid AliasMessageDTO aliasOnlyMessageDTO) {
+      String rcGroupId,
+      AliasMessageDTO aliasOnlyMessageDTO) {
     var type = aliasOnlyMessageDTO.getMessageType();
     var response = messenger
         .postAliasMessage(rcGroupId, type, aliasOnlyMessageDTO.getContent());

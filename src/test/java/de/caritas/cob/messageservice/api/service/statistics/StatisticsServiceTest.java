@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.reflect.Whitebox.setInternalState;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import de.caritas.cob.messageservice.api.service.LogService;
@@ -45,7 +44,6 @@ public class StatisticsServiceTest {
     createMessageStatisticsEvent = Mockito.mock(CreateMessageStatisticsEvent.class);
     when(createMessageStatisticsEvent.getEventType()).thenReturn(eventType);
     when(createMessageStatisticsEvent.getPayload()).thenReturn(Optional.of(PAYLOAD));
-    setInternalState(LogService.class, "LOGGER", logger);
     setField(statisticsService, FIELD_NAME_RABBIT_EXCHANGE_NAME, RABBIT_EXCHANGE_NAME);
   }
 
