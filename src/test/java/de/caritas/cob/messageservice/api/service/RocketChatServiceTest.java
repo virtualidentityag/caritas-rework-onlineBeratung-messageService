@@ -380,13 +380,14 @@ public class RocketChatServiceTest {
   }
 
   @Test
-  public void markGroupAsReadForSystemUser_Should_LogError_When_ProvidedWithInvalidRocketChatSystemUserCredentials()
+  public void markGroupAsReadForSystemUser_Should_NotInteractWithRestTemplate_When_ProvidedWithInvalidRocketChatSystemUserCredentials()
       throws SecurityException, RocketChatUserNotInitializedException {
 
     when(rcCredentialsHelper.getSystemUser()).thenReturn(INVALID_RCC_SYSTEM_USER);
 
     rocketChatService.markGroupAsReadForSystemUser(RC_GROUP_ID);
-    verify(logger, times(1)).error(anyString(), anyString());
+
+    verifyNoInteractions(restTemplate);
   }
 
   @Test(expected = InternalServerErrorException.class)

@@ -35,8 +35,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -192,6 +190,9 @@ public class MessageController implements MessagesApi {
   public ResponseEntity<MessageResponseDTO> createVideoHintMessage(String rcGroupId,
       VideoCallMessageDTO videoCallMessageDTO) {
 
+    if (videoCallMessageDTO == null) {
+      throw new BadRequestException("VideoCallMessageDTO is required.", LogService::logBadRequest);
+    }
     var response = this.messenger.createVideoHintMessage(rcGroupId,
         videoCallMessageDTO);
 

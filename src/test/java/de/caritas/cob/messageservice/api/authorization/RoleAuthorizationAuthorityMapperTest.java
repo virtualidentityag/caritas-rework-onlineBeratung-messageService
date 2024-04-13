@@ -29,7 +29,7 @@ public class RoleAuthorizationAuthorityMapperTest {
       .collect(Collectors.toSet());
 
   @Test
-  public void roleAuthorizationAuthorityMapper_Should_GrantCorrectAuthorities() throws Exception {
+  public void roleAuthorizationAuthorityMapper_Should_GrantCorrectAuthorities() {
 
     Principal principal = mock(Principal.class);
     RefreshableKeycloakSecurityContext securityContext =
