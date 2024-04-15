@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.0.6</version>
+    <version>3.0.13</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -29,8 +29,8 @@
     <log4j.version>2.17.1</log4j.version>
     <jackson.databind.nullable.version>0.2.3</jackson.databind.nullable.version>
     <openapi.generator.maven.version>6.4.0</openapi.generator.maven.version>
-    <liquibase-core.version>4.9.1</liquibase-core.version>
-    <liquibase-maven-plugin.version>4.1.1</liquibase-maven-plugin.version>
+    <liquibase-core.version>4.23.2</liquibase-core.version>
+    <liquibase-maven-plugin.version>4.23.2</liquibase-maven-plugin.version>
     <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
     <spring-security-test.version>6.0.5</spring-security-test.version>
     <maven.compiler.source>17</maven.compiler.source>
