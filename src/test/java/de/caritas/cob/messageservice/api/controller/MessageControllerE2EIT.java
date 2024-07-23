@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -39,7 +38,6 @@ import de.caritas.cob.messageservice.api.model.AliasArgs;
 import de.caritas.cob.messageservice.api.model.AliasMessageDTO;
 import de.caritas.cob.messageservice.api.model.AliasOnlyMessageDTO;
 import de.caritas.cob.messageservice.api.model.ConsultantReassignment;
-import de.caritas.cob.messageservice.api.model.ForwardMessageDTO;
 import de.caritas.cob.messageservice.api.model.MessageDTO;
 import de.caritas.cob.messageservice.api.model.MessageStreamDTO;
 import de.caritas.cob.messageservice.api.model.MessageType;
@@ -48,8 +46,6 @@ import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO;
 import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO.EventTypeEnum;
 import de.caritas.cob.messageservice.api.model.draftmessage.entity.DraftMessage;
 import de.caritas.cob.messageservice.api.model.rocket.chat.RocketChatCredentials;
-import de.caritas.cob.messageservice.api.model.rocket.chat.group.GetGroupInfoDto;
-import de.caritas.cob.messageservice.api.model.rocket.chat.group.GroupDto;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.MessagesDTO;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageResponseDTO;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageWrapper;
@@ -68,7 +64,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -974,69 +969,6 @@ class MessageControllerE2EIT {
   }
 
   @Test
-  @WithMockUser(authorities = {AuthorityValue.USE_FEEDBACK})
-  void createFeedbackMessageShouldReturnSendMessageResultOnSuccessfulRequest()
-      throws Exception {
-    givenAuthenticatedUser();
-    givenRocketChatSystemUser();
-    givenAFeedbackGroupResponse();
-    var rcFeedbackGroupId = RandomStringUtils.randomAlphabetic(16);
-    givenSuccessfulSendMessageResponse(null, rcFeedbackGroupId);
-    MessageDTO feedbackMessage = createMessage("a feedback message", null);
-    givenAMasterKey();
-
-    mockMvc.perform(
-            post("/messages/feedback/new")
-                .cookie(CSRF_COOKIE)
-                .header(CSRF_HEADER, CSRF_VALUE)
-                .header("rcToken", RandomStringUtils.randomAlphabetic(16))
-                .header("rcUserId", RandomStringUtils.randomAlphabetic(16))
-                .header("rcFeedbackGroupId", rcFeedbackGroupId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedbackMessage))
-        )
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("ts").isNotEmpty())
-        .andExpect(jsonPath("_updatedAt").isNotEmpty())
-        .andExpect(jsonPath("rid", is(rcFeedbackGroupId)))
-        .andExpect(jsonPath("org").doesNotExist())
-        .andExpect(jsonPath("t", is(nullValue())))
-        .andExpect(jsonPath("_id").isNotEmpty());
-
-    var messageRequestPayload = sendMessagePayloadCaptor.getValue().getBody();
-    assertNotNull(messageRequestPayload);
-  }
-
-  @Test
-  @WithMockUser(authorities = {AuthorityValue.USE_FEEDBACK})
-  void forwardMessageShouldReturnSendMessageResultOnSuccessfulRequest()
-      throws Exception {
-    givenAuthenticatedUser();
-    givenRocketChatSystemUser();
-    givenAFeedbackGroupResponse();
-    givenSuccessfulSendMessageResponse("e2e", RC_GROUP_ID);
-    givenAMasterKey();
-    ForwardMessageDTO forwardMessage = createForwardMessage();
-
-    mockMvc.perform(
-            post("/messages/forward")
-                .cookie(CSRF_COOKIE)
-                .header(CSRF_HEADER, CSRF_VALUE)
-                .header("rcToken", RandomStringUtils.randomAlphabetic(16))
-                .header("rcUserId", RandomStringUtils.randomAlphabetic(16))
-                .header("rcGroupId", RC_GROUP_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(forwardMessage))
-        )
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("ts").isNotEmpty())
-        .andExpect(jsonPath("_updatedAt").isNotEmpty())
-        .andExpect(jsonPath("rid", is(RC_GROUP_ID)))
-        .andExpect(jsonPath("t", is("e2e")))
-        .andExpect(jsonPath("_id").isNotEmpty());
-  }
-
-  @Test
   @WithMockUser(authorities = AuthorityValue.CONSULTANT_DEFAULT)
   void saveAliasOnlyMessageShouldReturnBadRequestIfReassignHasNoConsultantId() throws Exception {
     givenAuthenticatedUser();
@@ -1508,18 +1440,6 @@ class MessageControllerE2EIT {
     aliasOnlyMessage.setMessageType(messageType);
   }
 
-  private void givenAFeedbackGroupResponse() {
-    var getGroupInfoDto = new GetGroupInfoDto();
-    var feedbackGroup = new GroupDto();
-    feedbackGroup.setName("feedback chat Akajsdhn");
-    getGroupInfoDto.setGroup(feedbackGroup);
-    var getGroupInfoDtoHttpEntity = new ResponseEntity<>(getGroupInfoDto, HttpStatus.OK);
-    when(
-        restTemplate.exchange(any(URI.class), eq(HttpMethod.GET), any(),
-            eq(GetGroupInfoDto.class))).thenReturn(
-        getGroupInfoDtoHttpEntity);
-  }
-
   private MessageDTO createMessage(String text, String type) {
     var feedbackMessage = new MessageDTO();
     feedbackMessage.setMessage(text);
@@ -1536,17 +1456,6 @@ class MessageControllerE2EIT {
     vcm.setInitiatorRcUserId(consultantId);
     vcm.setEventType(EventTypeEnum.IGNORED_CALL);
     return vcm;
-  }
-
-  private ForwardMessageDTO createForwardMessage() {
-    var forwardMessage = new ForwardMessageDTO();
-    forwardMessage.setMessage("plx forward");
-    forwardMessage.setTimestamp(new Date().toString());
-    forwardMessage.setT("e2e");
-    forwardMessage.setUsername("Heinrich");
-    forwardMessage.setRcUserId(RC_USER_ID);
-    forwardMessage.setDisplayName("hk");
-    return forwardMessage;
   }
 
   private void assertGroupCall() {
