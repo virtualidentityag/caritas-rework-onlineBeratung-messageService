@@ -155,33 +155,6 @@ public class MessageController implements MessagesApi {
   }
 
   /**
-   * Posts a message in the specified Feedback Rocket.Chat group.
-   *
-   * @param rcToken           (required) Rocket.Chat token of the user
-   * @param rcUserId          (required) Rocket.Chat user ID
-   * @param rcFeedbackGroupId (required) Rocket.Chat group ID
-   * @param message           (required) the message
-   * @return {@link ResponseEntity} with the {@link HttpStatus}
-   */
-  @Override
-  public ResponseEntity<MessageResponseDTO> createFeedbackMessage(@RequestHeader String rcToken,
-      @RequestHeader String rcUserId, @RequestHeader String rcFeedbackGroupId,
-      @Valid @RequestBody MessageDTO message) {
-
-    var feedbackMessage = ChatMessage.builder()
-        .rcToken(rcToken)
-        .rcUserId(rcUserId)
-        .rcGroupId(rcFeedbackGroupId)
-        .text(message.getMessage())
-        .sendNotification(Boolean.TRUE.equals(message.getSendNotification()))
-        .type(message.getT()).build();
-
-    var response = messenger.postFeedbackGroupMessage(feedbackMessage);
-
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
-  }
-
-  /**
    * Creates a video event hint message.
    *
    * @param rcGroupId           the Rocket.Chat group to post the hint message
