@@ -28,7 +28,6 @@ import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_TIMESTAM
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_TOKEN;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_USER_ID;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.SEND_NOTIFICATION;
-import static de.caritas.cob.messageservice.testhelper.TestConstants.createFeedbackGroupMessage;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.createGroupMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -282,20 +281,6 @@ public class MessageControllerTestIT {
         .accept(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
   }
 
-  @Test
-  public void createFeedbackMessage_Should_ReturnCreated_WhenProvidedWithValidRequestValuesAndSuccessfulPostGroupMessageFacadeCall()
-      throws Exception {
-
-    mvc.perform(post(PATH_POST_CREATE_FEEDBACK_MESSAGE).header(QUERY_PARAM_RC_TOKEN, RC_TOKEN)
-            .header(QUERY_PARAM_RC_USER_ID, RC_USER_ID)
-            .header(QUERY_PARAM_RC_FEEDBACK_GROUP_ID, RC_FEEDBACK_GROUP_ID)
-            .content(VALID_MESSAGE_REQUEST_BODY_WITHOUT_NOTIFICATION)
-            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated());
-
-    verify(messenger, atLeastOnce()).postFeedbackGroupMessage(any(ChatMessage.class));
-  }
-
   /**
    * 204 - No Content test
    */
@@ -332,40 +317,6 @@ public class MessageControllerTestIT {
         .andExpect(status().isInternalServerError());
 
     verify(messenger, atLeastOnce()).postGroupMessage(any(ChatMessage.class));
-  }
-
-  @Test
-  public void forwardMessage_Should_ReturnInternalServerError_WhenProvidedWithValidRequestValuesAndPostGroupMessageFacadeResponseIsEmpty()
-      throws Exception {
-
-    doThrow(new InternalServerErrorException())
-        .when(messenger).postFeedbackGroupMessage(any(ChatMessage.class));
-
-    mvc.perform(post(PATH_POST_FORWARD_MESSAGE).header(QUERY_PARAM_RC_TOKEN, RC_TOKEN)
-        .header(QUERY_PARAM_RC_USER_ID, RC_USER_ID).header(QUERY_PARAM_RC_GROUP_ID, RC_GROUP_ID)
-        .content(VALID_FORWARD_MESSAGE_REQUEST_BODY).contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isInternalServerError());
-
-    verify(messenger, atLeastOnce()).postFeedbackGroupMessage(
-        any(ChatMessage.class));
-  }
-
-  @Test
-  public void createFeedbackMessage_Should_ReturnInternalServerError_WhenProvidedWithValidRequestValuesAndPostGroupMessageFacadeResponseIsEmpty()
-      throws Exception {
-
-    doThrow(new InternalServerErrorException()).when(messenger)
-        .postFeedbackGroupMessage(createFeedbackGroupMessage());
-
-    mvc.perform(post(PATH_POST_CREATE_FEEDBACK_MESSAGE).header(QUERY_PARAM_RC_TOKEN, RC_TOKEN)
-            .header(QUERY_PARAM_RC_USER_ID, RC_USER_ID)
-            .header(QUERY_PARAM_RC_FEEDBACK_GROUP_ID, RC_FEEDBACK_GROUP_ID)
-            .content(VALID_MESSAGE_REQUEST_BODY_WITHOUT_NOTIFICATION)
-            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isInternalServerError());
-
-    verify(messenger, atLeastOnce()).postFeedbackGroupMessage(
-        any(ChatMessage.class));
   }
 
   /**

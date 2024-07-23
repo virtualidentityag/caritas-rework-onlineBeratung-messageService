@@ -108,18 +108,6 @@ class EmailNotificationFacadeTest {
   }
 
   @Test
-  void sendFeedbackEmailNotification_Should_sendExpectedFeedbackNotificationMailViaUserService() {
-    when(clientFactory.userControllerApi()).thenReturn(userControllerApi);
-    givenApiClientAndHeadersAreConfigured();
-    // when
-    emailNotificationFacade.sendEmailAboutNewFeedbackMessage(RC_GROUP_ID, Optional.empty(), null);
-
-    // then
-    var expectedMessage = new NewMessageNotificationDTO().rcGroupId(RC_GROUP_ID);
-    verify(userControllerApi).sendNewFeedbackMessageNotification(expectedMessage);
-  }
-
-  @Test
   void sendEmailAboutReassignRequest_Should_sendExpectedReassignNotificationMailViaUserService() {
     // given
     when(clientFactory.userControllerApi()).thenReturn(userControllerApi);
