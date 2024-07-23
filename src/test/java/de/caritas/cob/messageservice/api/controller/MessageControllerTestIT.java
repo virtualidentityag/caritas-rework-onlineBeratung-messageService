@@ -21,7 +21,6 @@ import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_ATTACHME
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_ATTACHMENT_TITLE_LINK;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_ATTACHMENT_TITLE_LINK_DOWNLOAD;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_COUNT;
-import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_FEEDBACK_GROUP_ID;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_GROUP_ID;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_OFFSET;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_TIMESTAMP;
@@ -117,7 +116,6 @@ public class MessageControllerTestIT {
   private final String QUERY_PARAM_RC_USER_ID = "rcUserId";
   private final String QUERY_PARAM_RC_GROUP_ID = "rcGroupId";
   private final String QUERY_PARAM_RC_TOKEN = "rcToken";
-  private final String QUERY_PARAM_RC_FEEDBACK_GROUP_ID = "rcFeedbackGroupId";
   private final String MASTER_KEY_1 = "key1";
 
   @Autowired
@@ -208,17 +206,6 @@ public class MessageControllerTestIT {
     mvc.perform(post(PATH_POST_FORWARD_MESSAGE).content(VALID_FORWARD_MESSAGE_REQUEST_BODY)
             .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
-  }
-
-  @Test
-  public void createFeedbackMessage_Should_ReturnBadRequest_WhenProvidedWithInvalidRequestBody()
-      throws Exception {
-
-    mvc.perform(post(PATH_POST_CREATE_FEEDBACK_MESSAGE).header(QUERY_PARAM_RC_TOKEN, RC_TOKEN)
-        .header(QUERY_PARAM_RC_USER_ID, RC_USER_ID)
-        .header(QUERY_PARAM_RC_FEEDBACK_GROUP_ID, RC_FEEDBACK_GROUP_ID)
-        .content(INVALID_MESSAGE_REQUEST_BODY).contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
   }
 
   @Test

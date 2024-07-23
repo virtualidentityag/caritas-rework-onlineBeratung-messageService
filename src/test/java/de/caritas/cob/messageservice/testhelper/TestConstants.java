@@ -26,8 +26,6 @@ public class TestConstants {
   public static final String RC_COUNT = "0";
   public static final String RC_GROUP_ID = "fR2Rz7dmWmHdXE8uz";
   public static final String RC_GROUP_NAME = "405_1590499423659";
-  public static final String RC_FEEDBACK_GROUP_ID = "Ad3RzsdmWmHdXE8xy";
-  public static final String RC_FEEDBACK_GROUP_NAME = "405_feedback_1590499423600";
   public static final String RC_TIMESTAMP = "2018-11-15T09:32:55.045Z";
   public static final String RC_ATTACHMENT_ID = "aR2Rz7dmWmHdXE8u3";
   public static final String RC_ATTACHMENT_TITLE = "filename.jpg";
@@ -93,19 +91,10 @@ public class TestConstants {
    */
   public static final GroupDto GROUP_DTO = new GroupDto(RC_GROUP_ID, RC_GROUP_NAME);
   public static final GetGroupInfoDto GET_GROUP_INFO_DTO = new GetGroupInfoDto(GROUP_DTO, true);
-  public static final GroupDto GROUP_DTO_FEEDBACK_CHAT =
-      new GroupDto(RC_FEEDBACK_GROUP_ID, RC_FEEDBACK_GROUP_NAME);
-  public static final GetGroupInfoDto GET_GROUP_INFO_DTO_FEEDBACK_CHAT =
-      new GetGroupInfoDto(GROUP_DTO_FEEDBACK_CHAT, true);
 
   public static ChatMessage createGroupMessage() {
     return ChatMessage.builder().rcToken(RC_TOKEN).rcUserId(RC_USER_ID)
         .rcGroupId(RC_GROUP_ID).text(MESSAGE).build();
-  }
-
-  public static ChatMessage createFeedbackGroupMessage() {
-    return ChatMessage.builder().rcToken(RC_TOKEN).rcUserId(RC_USER_ID)
-        .rcGroupId(RC_FEEDBACK_GROUP_ID).text(MESSAGE).build();
   }
 
   public static SendMessageResponseDTO createSuccessfulMessageResult(String type, String roomId) {

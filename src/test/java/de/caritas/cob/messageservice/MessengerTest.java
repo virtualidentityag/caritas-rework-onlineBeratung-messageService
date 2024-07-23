@@ -10,7 +10,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
@@ -57,7 +56,6 @@ public class MessengerTest {
   private static final String RC_USER_ID = "pptLwARyTMzbTTRdg";
   private static final String CONSULTANT_ID = "d63f4cc0-215d-40e2-a866-2d3e910f0590";
   private static final String RC_GROUP_ID = "fR2Rz7dmWmHdXE8uz";
-  private static final String RC_FEEDBACK_GROUP_ID = "fR2Rz7dmWmHdXE8uz";
   private static final String MESSAGE = "Lorem ipsum";
   private static final String RC_SYSTEM_USER_ID = "systemUserId";
   private static final SendMessageResponseDTO POST_MESSAGE_RESPONSE_DTO = new SendMessageResponseDTO(
@@ -199,19 +197,6 @@ public class MessengerTest {
   }
 
   @Test
-  public void postGroupMessage_Should_notSendLiveNotification_When_userIsRocketChatSystemUser()
-      throws CustomCryptoException {
-
-    var systemFeedbackMessage = createFeedbackGroupMessage().rcUserId(RC_SYSTEM_USER_ID).build();
-    when(rocketChatService.postGroupMessage(systemFeedbackMessage)).thenReturn(
-        POST_MESSAGE_RESPONSE_DTO);
-
-    messenger.postGroupMessage(systemFeedbackMessage);
-
-    verifyNoInteractions(this.liveEventNotificationService);
-  }
-
-  @Test
   public void postGroupMessage_Should_deleteDraftMessage_When_RocketChatServiceSucceeds()
       throws CustomCryptoException {
 
@@ -291,11 +276,6 @@ public class MessengerTest {
 
     verify(emailNotificationFacade).sendEmailAboutNewChatMessage(RC_GROUP_ID, Optional.empty(),
         null);
-  }
-
-  private ChatMessageBuilder createFeedbackGroupMessage() {
-    return ChatMessage.builder().rcToken(RC_TOKEN).rcUserId(RC_USER_ID)
-        .rcGroupId(RC_FEEDBACK_GROUP_ID).text(MESSAGE);
   }
 
   private ChatMessageBuilder createGroupMessage() {
