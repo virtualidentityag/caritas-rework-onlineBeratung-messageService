@@ -4,7 +4,6 @@ import static de.caritas.cob.messageservice.api.authorization.Authority.Authorit
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.CONSULTANT_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.TECHNICAL_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USER_DEFAULT;
-import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USE_FEEDBACK;
 
 import de.caritas.cob.messageservice.api.authorization.RoleAuthorizationAuthorityMapper;
 import de.caritas.cob.messageservice.filter.StatelessCsrfFilter;
@@ -84,8 +83,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, ANONYMOUS_DEFAULT)
         .antMatchers("/messages/new")
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT, ANONYMOUS_DEFAULT)
-        .antMatchers("/messages/forward", "/messages/feedback/new")
-        .hasAuthority(USE_FEEDBACK)
         .antMatchers("/messages/aliasonly/new")
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT)
         .antMatchers("/messages/aliasWithContent/new")

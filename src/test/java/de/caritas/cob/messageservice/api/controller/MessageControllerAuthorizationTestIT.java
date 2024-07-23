@@ -213,18 +213,6 @@ public class MessageControllerAuthorizationTestIT {
   }
 
   @Test
-  @WithMockUser(authorities = {AuthorityValue.USE_FEEDBACK})
-  public void forwardMessage_Should_ReturnForbiddenAndCallNoMethods_WhenNoCsrfTokens()
-      throws Exception {
-
-    mvc.perform(post(PATH_POST_FORWARD_MESSAGE).contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
-
-    verifyNoMoreInteractions(rocketChatService);
-    verifyNoMoreInteractions(messenger);
-  }
-
-  @Test
   public void createFeedbackMessage_Should_ReturnUnauthorizedAndCallNoMethods_WhenNoKeycloakAuthorization()
       throws Exception {
 
@@ -246,18 +234,6 @@ public class MessageControllerAuthorizationTestIT {
             post(PATH_POST_CREATE_FEEDBACK_MESSAGE).cookie(csrfCookie).header(CSRF_HEADER, CSRF_VALUE)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isForbidden());
-
-    verifyNoMoreInteractions(rocketChatService);
-    verifyNoMoreInteractions(messenger);
-  }
-
-  @Test
-  @WithMockUser(authorities = {AuthorityValue.USE_FEEDBACK})
-  public void createFeedbackMessage_Should_ReturnForbiddenAndCallNoMethods_WhenNoCsrfTokens()
-      throws Exception {
-
-    mvc.perform(post(PATH_POST_CREATE_FEEDBACK_MESSAGE).contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
 
     verifyNoMoreInteractions(rocketChatService);
     verifyNoMoreInteractions(messenger);
@@ -534,8 +510,7 @@ public class MessageControllerAuthorizationTestIT {
   @WithMockUser(authorities = {
       AuthorityValue.ANONYMOUS_DEFAULT,
       AuthorityValue.CONSULTANT_DEFAULT,
-      AuthorityValue.TECHNICAL_DEFAULT,
-      AuthorityValue.USE_FEEDBACK
+      AuthorityValue.TECHNICAL_DEFAULT
   })
   public void patchMessageShouldReturnForbiddenAndCallNoMethodsWhenNoUserDefaultAuthority()
       throws Exception {
@@ -584,8 +559,7 @@ public class MessageControllerAuthorizationTestIT {
 
   @Test
   @WithMockUser(authorities = {
-      AuthorityValue.TECHNICAL_DEFAULT,
-      AuthorityValue.USE_FEEDBACK
+      AuthorityValue.TECHNICAL_DEFAULT
   })
   public void deleteMessageShouldReturnForbiddenAndCallNoMethodsWhenNoUserDefaultAuthority()
       throws Exception {
@@ -628,8 +602,7 @@ public class MessageControllerAuthorizationTestIT {
 
   @Test
   @WithMockUser(authorities = {
-      AuthorityValue.TECHNICAL_DEFAULT,
-      AuthorityValue.USE_FEEDBACK
+      AuthorityValue.TECHNICAL_DEFAULT
   })
   public void findMessageShouldReturnForbiddenAndCallNoMethodsWhenNoSupportedAuthority()
       throws Exception {
