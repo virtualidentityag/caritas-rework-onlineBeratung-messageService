@@ -2,10 +2,8 @@ package de.caritas.cob.messageservice.api.controller;
 
 import static de.caritas.cob.messageservice.api.controller.MessageControllerAuthorizationTestIT.PATH_GET_MESSAGE_STREAM;
 import static de.caritas.cob.messageservice.api.controller.MessageControllerAuthorizationTestIT.PATH_POST_CREATE_ALIAS_ONLY_MESSAGE;
-import static de.caritas.cob.messageservice.api.controller.MessageControllerAuthorizationTestIT.PATH_POST_CREATE_FEEDBACK_MESSAGE;
 import static de.caritas.cob.messageservice.api.controller.MessageControllerAuthorizationTestIT.PATH_POST_CREATE_MESSAGE;
 import static de.caritas.cob.messageservice.api.controller.MessageControllerAuthorizationTestIT.PATH_POST_CREATE_VIDEO_HINT_MESSAGE;
-import static de.caritas.cob.messageservice.api.controller.MessageControllerAuthorizationTestIT.PATH_POST_FORWARD_MESSAGE;
 import static de.caritas.cob.messageservice.api.model.draftmessage.SavedDraftType.NEW_MESSAGE;
 import static de.caritas.cob.messageservice.api.model.draftmessage.SavedDraftType.OVERWRITTEN_MESSAGE;
 import static de.caritas.cob.messageservice.testhelper.TestConstants.DONT_SEND_NOTIFICATION;
@@ -190,35 +188,6 @@ public class MessageControllerTestIT {
         .andExpect(status().isBadRequest());
   }
 
-  @Test
-  public void forwardMessage_Should_ReturnBadRequest_WhenProvidedWithInvalidRequestBody()
-      throws Exception {
-
-    mvc.perform(post(PATH_POST_FORWARD_MESSAGE).header(QUERY_PARAM_RC_TOKEN, RC_TOKEN)
-        .header(QUERY_PARAM_RC_USER_ID, RC_USER_ID).header(QUERY_PARAM_RC_GROUP_ID, RC_GROUP_ID)
-        .content(INVALID_MESSAGE_REQUEST_BODY).contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
-  }
-
-  @Test
-  public void forwardMessage_Should_ReturnBadRequest_WhenHeaderValuesAreMissing() throws Exception {
-
-    mvc.perform(post(PATH_POST_FORWARD_MESSAGE).content(VALID_FORWARD_MESSAGE_REQUEST_BODY)
-            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest());
-  }
-
-  @Test
-  public void createFeedbackMessage_Should_ReturnBadRequest_WhenHeaderValuesAreMissing()
-      throws Exception {
-
-    mvc.perform(
-            post(PATH_POST_CREATE_FEEDBACK_MESSAGE)
-                .content(VALID_MESSAGE_REQUEST_BODY_WITHOUT_NOTIFICATION)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest());
-  }
-
   /**
    * 200 - OK & 201 CREATED tests
    */
@@ -256,16 +225,6 @@ public class MessageControllerTestIT {
         .andExpect(status().isCreated());
 
     verify(messenger, atLeastOnce()).postGroupMessage(any(ChatMessage.class));
-  }
-
-  @Test
-  public void forwardMessage_Should_ReturnCreated_WhenProvidedWithValidRequestValuesAndSuccessfulPostGroupMessageFacadeCall()
-      throws Exception {
-
-    mvc.perform(post(PATH_POST_FORWARD_MESSAGE).header(QUERY_PARAM_RC_TOKEN, RC_TOKEN)
-        .header(QUERY_PARAM_RC_USER_ID, RC_USER_ID).header(QUERY_PARAM_RC_GROUP_ID, RC_GROUP_ID)
-        .content(VALID_FORWARD_MESSAGE_REQUEST_BODY).contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
   }
 
   /**
@@ -533,24 +492,4 @@ public class MessageControllerTestIT {
 
     verifyNoInteractions(this.messenger);
   }
-
-  @Test
-  public void saveAliasOnlyMessage_Should_ReturnCreated_When_paramsAreValid()
-      throws Exception {
-    var aliasOnlyMessageDTO = easyRandom.nextObject(AliasOnlyMessageDTO.class);
-    aliasOnlyMessageDTO.setMessageType(MessageType.FORWARD);
-    aliasOnlyMessageDTO.setArgs(null);
-
-    mvc.perform(
-            post(PATH_POST_CREATE_ALIAS_ONLY_MESSAGE)
-                .header("rcGroupId", RC_GROUP_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(aliasOnlyMessageDTO))
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated());
-
-    verify(this.messenger, times(1))
-        .createEvent(RC_GROUP_ID, MessageType.FORWARD, null);
-  }
-
 }

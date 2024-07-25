@@ -187,36 +187,6 @@ public class RocketChatServiceTest {
   }
 
   @Test
-  public void getGroupMessages_Should_SetForwardAsMessageType_ForForwardedMessages()
-      throws NoSuchFieldException {
-    Whitebox.setInternalState(rocketChatService, "rcGetGroupMessageUrl", "http://localhost/api/v1/groups.messages");
-    EasyRandom easyRandom = new EasyRandom();
-    MessageStreamDTO messageStreamDTO = easyRandom.nextObject(MessageStreamDTO.class);
-    messageStreamDTO.setMessages(easyRandom.objects(MessagesDTO.class, 5)
-        .collect(Collectors.toList()));
-    messageStreamDTO.getMessages().get(0).getAlias().setMessageType(null);
-    messageStreamDTO.getMessages().get(0).getAlias().setVideoCallMessageDTO(null);
-
-    var mapper = new MessageMapper(null, null);
-    messageStreamDTO.getMessages().forEach(messagesDTO -> {
-      when(messageMapper.typedMessageOf(eq(messagesDTO)))
-            .thenReturn(messagesDTO);
-      when(messageMapper.messageTypeOf(eq(messagesDTO.getAlias())))
-            .thenReturn(mapper.messageTypeOf(messagesDTO.getAlias()));
-    });
-
-    when(restTemplate.exchange(any(), any(HttpMethod.class), any(),
-        ArgumentMatchers.<Class<MessageStreamDTO>>any()))
-        .thenReturn(new ResponseEntity<>(messageStreamDTO,
-            HttpStatus.OK));
-
-    MessageStreamDTO result = rocketChatService.getGroupMessages(RC_TOKEN, RC_USER_ID, RC_GROUP_ID,
-        0, 0, Instant.now());
-
-    assertThat(result.getMessages().get(0).getAlias().getMessageType(), is(MessageType.FORWARD));
-  }
-
-  @Test
   public void getGroupMessages_Should_SetVideocallAsMessageType_ForVideocallMessages()
       throws NoSuchFieldException {
 

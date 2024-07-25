@@ -188,10 +188,6 @@ public class MessageMapper {
         return alias.getMessageType();
       }
 
-      if (nonNull(alias.getForwardMessageDTO())) {
-        return MessageType.FORWARD;
-      }
-
       if (nonNull(alias.getVideoCallMessageDTO())) {
         return MessageType.VIDEOCALL;
       }
