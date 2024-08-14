@@ -37,7 +37,6 @@ import de.caritas.cob.messageservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.messageservice.api.model.AliasArgs;
 import de.caritas.cob.messageservice.api.model.AliasMessageDTO;
 import de.caritas.cob.messageservice.api.model.AliasOnlyMessageDTO;
-import de.caritas.cob.messageservice.api.model.ConsultantReassignment;
 import de.caritas.cob.messageservice.api.model.MessageDTO;
 import de.caritas.cob.messageservice.api.model.MessageStreamDTO;
 import de.caritas.cob.messageservice.api.model.MessageType;
@@ -46,6 +45,8 @@ import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO;
 import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO.EventTypeEnum;
 import de.caritas.cob.messageservice.api.model.draftmessage.entity.DraftMessage;
 import de.caritas.cob.messageservice.api.model.rocket.chat.RocketChatCredentials;
+import de.caritas.cob.messageservice.api.model.rocket.chat.group.GetGroupInfoDto;
+import de.caritas.cob.messageservice.api.model.rocket.chat.group.GroupDto;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.MessagesDTO;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageResponseDTO;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageWrapper;
@@ -68,7 +69,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.AfterEach;
@@ -150,7 +151,7 @@ class MessageControllerE2EIT {
 
   private AliasOnlyMessageDTO aliasOnlyMessage;
   private List<MessagesDTO> messages;
-  private ConsultantReassignment consultantReassignment;
+  private AliasArgs consultantReassignment;
   private String messageId;
   private AliasArgs aliasArgs;
   private Message message;
@@ -226,7 +227,7 @@ class MessageControllerE2EIT {
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     var messagesResponse = objectMapper.readValue(response, MessageStreamDTO.class);
     var message = messagesResponse.getMessages().get(1).getMsg(); // 1 due to split before
-    var consultantReassignment = objectMapper.readValue(message, ConsultantReassignment.class);
+    var consultantReassignment = objectMapper.readValue(message, AliasArgs.class);
 
     assertEquals(this.consultantReassignment, consultantReassignment);
     assertGroupCall();
@@ -1048,9 +1049,10 @@ class MessageControllerE2EIT {
 
     var decryptedMsg = encryptionService.decrypt(sendMessageRequest.getMsg(), RC_GROUP_ID);
     var decryptedConsultantReassignment =
-        objectMapper.readValue(decryptedMsg, ConsultantReassignment.class);
+        objectMapper.readValue(decryptedMsg, AliasArgs.class);
+    AliasArgs args = aliasOnlyMessage.getArgs();
     assertEquals(
-        aliasOnlyMessage.getArgs().getFromConsultantId(),
+        args.getFromConsultantId(),
         decryptedConsultantReassignment.getFromConsultantId()
     );
   }
@@ -1145,7 +1147,7 @@ class MessageControllerE2EIT {
   }
 
   private void givenAMessageWithAnEncryptedConsultantReassignment(String groupId) {
-    consultantReassignment = new ConsultantReassignment();
+    consultantReassignment = new AliasArgs();
     consultantReassignment.setToConsultantId(UUID.randomUUID());
     consultantReassignment.setStatus(ReassignStatus.REQUESTED);
 
@@ -1327,7 +1329,7 @@ class MessageControllerE2EIT {
     var encodedAlias = URLEncoder.encode(aliasString, StandardCharsets.UTF_8);
     message.setAlias(encodedAlias);
 
-    var consultantReassignment = new ConsultantReassignment();
+    var consultantReassignment = new AliasArgs();
     consultantReassignment.setStatus(ReassignStatus.REQUESTED);
     consultantReassignment.setToConsultantId(UUID.randomUUID());
     var msg = objectMapper.writeValueAsString(consultantReassignment);
@@ -1394,7 +1396,7 @@ class MessageControllerE2EIT {
   }
 
   private void givenAnAliasOnlyMessageWithUnsupportedMessage() {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = givenNewAliasOnlyMessage();
     var messageType = easyRandom.nextBoolean()
         ? MessageType.FURTHER_STEPS
         : MessageType.E2EE_ACTIVATED;
@@ -1404,25 +1406,30 @@ class MessageControllerE2EIT {
   private void givenAnAliasOnlyMessageWithSupportedMessage() {
     aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
     aliasOnlyMessage.setMessageType(MessageType.REASSIGN_CONSULTANT);
-    aliasOnlyMessage.getArgs().setStatus(ReassignStatus.REQUESTED);
+    AliasArgs args = aliasOnlyMessage.getArgs();
+    args.setStatus(ReassignStatus.REQUESTED);
   }
 
   private void givenAnAliasOnlyMessageWithSupportedMessageAndEmptyArgs() {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = givenNewAliasOnlyMessage();
     aliasOnlyMessage.setMessageType(MessageType.REASSIGN_CONSULTANT);
     aliasOnlyMessage.setArgs(null);
   }
 
   private void givenAReassignmentEventWithNoConsultantId() {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = givenNewAliasOnlyMessage();
     var args = new AliasArgs();
     args.setStatus(ReassignStatus.REQUESTED);
     aliasOnlyMessage.setArgs(args);
     aliasOnlyMessage.setMessageType(MessageType.REASSIGN_CONSULTANT);
   }
 
+  private AliasOnlyMessageDTO givenNewAliasOnlyMessage() {
+    return new AliasOnlyMessageDTO().args(new AliasArgs());
+  }
+
   private void givenAnAliasOnlyMessage(boolean muteUnmute) {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = new AliasOnlyMessageDTO().messageType(MessageType.USER_MUTED).args(new AliasArgs());
     aliasOnlyMessage.setArgs(null);
 
     MessageType messageType;

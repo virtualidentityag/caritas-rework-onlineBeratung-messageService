@@ -31,6 +31,7 @@ import de.caritas.cob.messageservice.api.service.DraftMessageService;
 import de.caritas.cob.messageservice.api.service.LiveEventNotificationService;
 import de.caritas.cob.messageservice.api.service.MessageMapper;
 import de.caritas.cob.messageservice.api.service.RocketChatService;
+import de.caritas.cob.messageservice.api.service.SessionService;
 import de.caritas.cob.messageservice.api.service.statistics.StatisticsService;
 import de.caritas.cob.messageservice.api.service.statistics.event.CreateMessageStatisticsEvent;
 import de.caritas.cob.messageservice.statisticsservice.generated.web.model.UserRole;
@@ -83,9 +84,13 @@ public class MessengerTest {
   @Mock
   private AuthenticatedUser authenticatedUser;
 
+  @Mock
+  private SessionService sessionService;
+
   @SuppressWarnings("unused")
   @Spy
   private MessageMapper mapper = new MessageMapper(new ObjectMapper(), null);
+
 
   @Before
   public void setup() {

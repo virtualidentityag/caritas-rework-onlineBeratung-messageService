@@ -8,7 +8,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,13 +20,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Authority {
 
-  ANONYMOUS(Role.ANONYMOUS, singletonList(ANONYMOUS_DEFAULT)),
-  USER(Role.USER, singletonList(USER_DEFAULT)),
-  CONSULTANT(Role.CONSULTANT, singletonList(CONSULTANT_DEFAULT)),
-  TECHNICAL(Role.TECHNICAL, singletonList(TECHNICAL_DEFAULT));
+  ANONYMOUS(Role.ANONYMOUS.getRoleName(), singletonList(ANONYMOUS_DEFAULT)),
+  USER(Role.USER.getRoleName(), singletonList(USER_DEFAULT)),
+  CONSULTANT(Role.CONSULTANT.getRoleName(), singletonList(CONSULTANT_DEFAULT)),
+  TECHNICAL(Role.TECHNICAL.getRoleName(), singletonList(TECHNICAL_DEFAULT));
 
-  private final Role userRole;
-  private final List<String> grantedAuthorities;
+  private final String roleName;
+  private final List<String> authorities;
 
   /**
    * Get all authorities for a specific role.
@@ -35,12 +35,21 @@ public enum Authority {
    * @return the related authorities
    */
   public static List<String> getAuthoritiesByUserRole(Role userRole) {
-    Optional<Authority> authorityByUserRole = Stream.of(values())
-        .filter(authority -> authority.userRole.equals(userRole))
-        .findFirst();
+    var authorities = Stream.of(values())
+        .filter(authority -> authority.getRoleName().equals(userRole.getRoleName())).toList();
 
-    return authorityByUserRole.isPresent() ? authorityByUserRole.get().getGrantedAuthorities()
-        : emptyList();
+    List<String> collect = authorities.stream().map(a -> a.getAuthorities())
+        .flatMap(a -> a.stream()).collect(
+            Collectors.toList());
+    return authorities.isEmpty() ? emptyList() : collect;
+
+  }
+
+  public static Authority fromRoleName(String roleName) {
+    return Stream.of(values())
+        .filter(authority -> authority.roleName.equals(roleName))
+        .findFirst()
+        .orElse(null);
   }
 
   public static class AuthorityValue {
