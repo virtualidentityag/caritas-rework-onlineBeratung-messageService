@@ -4,33 +4,19 @@ import static de.caritas.cob.messageservice.api.authorization.Authority.Authorit
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.CONSULTANT_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.TECHNICAL_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USER_DEFAULT;
-import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USE_FEEDBACK;
 
-import de.caritas.cob.messageservice.api.authorization.RoleAuthorizationAuthorityMapper;
 import de.caritas.cob.messageservice.config.security.AuthorisationService;
 import de.caritas.cob.messageservice.config.security.JwtAuthConverter;
 import de.caritas.cob.messageservice.config.security.JwtAuthConverterProperties;
 import de.caritas.cob.messageservice.filter.StatelessCsrfFilter;
-import org.keycloak.adapters.KeycloakConfigResolver;
-import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
-import org.keycloak.adapters.springsecurity.client.KeycloakClientRequestFactory;
-import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticatedActionsFilter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakSecurityContextRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -94,8 +80,6 @@ public class SecurityConfig implements WebMvcConfigurer {
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, ANONYMOUS_DEFAULT)
         .requestMatchers("/messages/new")
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT, ANONYMOUS_DEFAULT)
-        .requestMatchers("/messages/forward", "/messages/feedback/new")
-        .hasAuthority(USE_FEEDBACK)
         .requestMatchers("/messages/aliasonly/new")
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT)
         .requestMatchers("/messages/aliasWithContent/new")
