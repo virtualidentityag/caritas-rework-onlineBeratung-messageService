@@ -92,9 +92,6 @@ public class MessageControllerTestIT {
 
   private final String VALID_MESSAGE_REQUEST_BODY_WITHOUT_NOTIFICATION =
       "{\"message\": \"Lorem ipsum\", \"sendNotification\": " + DONT_SEND_NOTIFICATION + "}";
-  private final String VALID_FORWARD_MESSAGE_REQUEST_BODY = "{\"message\": \"" + MESSAGE + "\","
-      + "\"timestamp\": \"2018-11-15T09:33:00.057Z\", \"username\": \"asker23\",\r\n"
-      + "\"rcUserId\": \"ag89h3tjkerg94t\"}";
   private final String INVALID_MESSAGE_REQUEST_BODY = "{\"in\": \"valid\"}";
   private final FileDTO FILE_DTO =
       new FileDTO().id(RC_ATTACHMENT_ID).name(RC_ATTACHMENT_TITLE).type(RC_ATTACHMENT_FILE_TYPE);

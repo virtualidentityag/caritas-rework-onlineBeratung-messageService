@@ -57,14 +57,6 @@ public class TestConstants {
    * Messages
    */
   public static final String MESSAGE = "Lorem ipsum";
-  public static final String MESSAGE_FORWARD_ALIAS_JSON_WITH_ENCODED_USERNAME =
-      "{\"alias\":\"%7B%22timestamp%22%3A%221568128850636%22%2C%22username%22%3A%22"
-          + USERNAME_ENCODED
-          + "%22%2C%22rcUserId%22%3A%22p5NdZSxc2Kh7GfXdB%22%7D\"";
-  public static final String MESSAGE_FORWARD_ALIAS_JSON_WITH_DECODED_USERNAME =
-      "{\"alias\":\"%7B%22timestamp%22%3A%221568128850636%22%2C%22username%22%3A%22"
-          + USERNAME_DECODED
-          + "%22%2C%22rcUserId%22%3A%22p5NdZSxc2Kh7GfXdB%22%7D\"";
   public static final String MESSAGE_ALIAS_VIDEOCALL_JSON_WITH_ENCODED_USERNAME =
       "{\"alias\":\"%7B%22timestamp%22%3A%221568128850636%22%2C%22username%22%3A%22"
           + USERNAME_ENCODED
