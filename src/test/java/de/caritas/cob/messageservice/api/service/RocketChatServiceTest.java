@@ -195,7 +195,6 @@ public class RocketChatServiceTest {
     messageStreamDTO.setMessages(easyRandom.objects(MessagesDTO.class, 5)
         .collect(Collectors.toList()));
     messageStreamDTO.getMessages().get(0).getAlias().setMessageType(null);
-    messageStreamDTO.getMessages().get(0).getAlias().setForwardMessageDTO(null);
 
     var mapper = new MessageMapper(null, null);
     messageStreamDTO.getMessages().forEach(messagesDTO -> {
@@ -225,7 +224,6 @@ public class RocketChatServiceTest {
     messageStreamDTO.setMessages(easyRandom.objects(MessagesDTO.class, 5)
         .collect(Collectors.toList()));
     messageStreamDTO.getMessages().get(0).getAlias().setMessageType(MessageType.FURTHER_STEPS);
-    messageStreamDTO.getMessages().get(0).getAlias().setForwardMessageDTO(null);
     messageStreamDTO.getMessages().get(0).getAlias().setVideoCallMessageDTO(null);
 
     var mapper = new MessageMapper(null, null);
