@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
       - name: Maven Package
         run: mvn -B -Pprod  clean package -DskipTests
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: targetfiles
           path: target/*.jar
