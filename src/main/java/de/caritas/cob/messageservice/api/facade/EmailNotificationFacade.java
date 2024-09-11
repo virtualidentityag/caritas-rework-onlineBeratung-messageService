@@ -53,22 +53,6 @@ public class EmailNotificationFacade {
     headers.forEach((key, value) -> apiClient.addDefaultHeader(key, value.iterator().next()));
   }
 
-  /**
-   * Sends a new feedback message notification via the UserService (user data needed for sending the
-   * mail will be read by the UserService, which in turn calls the MessageService).
-   *
-   * @param rcGroupId - Rocket.Chat group id
-   */
-  @Async
-  public void sendEmailAboutNewFeedbackMessage(String rcGroupId, Optional<Long> tenantId,
-      String accessToken) {
-
-    var userControllerApi = clientFactory.userControllerApi();
-    addDefaultHeaders(userControllerApi.getApiClient(), accessToken, tenantId);
-    userControllerApi
-        .sendNewFeedbackMessageNotification(new NewMessageNotificationDTO().rcGroupId(rcGroupId));
-  }
-
   @Async
   public void sendEmailAboutReassignRequest(String rcGroupId, AliasArgs aliasArgs,
       Optional<Long> tenantId, String accessToken) {

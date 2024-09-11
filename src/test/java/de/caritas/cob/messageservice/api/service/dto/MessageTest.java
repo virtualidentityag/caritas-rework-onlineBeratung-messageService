@@ -91,7 +91,6 @@ class MessageTest {
 
     assertTrue(message.isA(MessageType.FURTHER_STEPS));
     assertFalse(message.isA(MessageType.USER_MUTED));
-    assertFalse(message.isA(MessageType.FORWARD));
     assertFalse(message.isA(MessageType.REASSIGN_CONSULTANT));
   }
 
@@ -103,7 +102,6 @@ class MessageTest {
 
     assertFalse(message.isA(MessageType.FURTHER_STEPS));
     assertFalse(message.isA(MessageType.USER_MUTED));
-    assertFalse(message.isA(MessageType.FORWARD));
     assertFalse(message.isA(MessageType.REASSIGN_CONSULTANT));
   }
 
@@ -116,7 +114,6 @@ class MessageTest {
 
     assertFalse(message.isA(MessageType.FURTHER_STEPS));
     assertFalse(message.isA(MessageType.USER_MUTED));
-    assertFalse(message.isA(MessageType.FORWARD));
     assertFalse(message.isA(MessageType.REASSIGN_CONSULTANT));
   }
 
@@ -127,7 +124,6 @@ class MessageTest {
 
     assertFalse(message.isA(MessageType.FURTHER_STEPS));
     assertFalse(message.isA(MessageType.USER_MUTED));
-    assertFalse(message.isA(MessageType.FORWARD));
     assertFalse(message.isA(MessageType.REASSIGN_CONSULTANT));
   }
 

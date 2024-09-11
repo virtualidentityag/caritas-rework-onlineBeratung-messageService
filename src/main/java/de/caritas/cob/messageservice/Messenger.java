@@ -20,7 +20,6 @@ import de.caritas.cob.messageservice.api.model.MessageResponseDTO;
 import de.caritas.cob.messageservice.api.model.MessageType;
 import de.caritas.cob.messageservice.api.model.ReassignStatus;
 import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO;
-import de.caritas.cob.messageservice.api.model.rocket.chat.group.GetGroupInfoDto;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageResponseDTO;
 import de.caritas.cob.messageservice.api.service.DraftMessageService;
 import de.caritas.cob.messageservice.api.service.LiveEventNotificationService;
@@ -49,8 +48,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class Messenger {
 
-  private static final String FEEDBACK_GROUP_IDENTIFIER = "feedback";
-
   private final @NonNull RocketChatService rocketChatService;
   private final @NonNull EmailNotificationFacade emailNotificationFacade;
   private final @NonNull LiveEventNotificationService liveEventNotificationService;
@@ -76,19 +73,6 @@ public class Messenger {
   public MessageResponseDTO postGroupMessage(ChatMessage chatMessage) {
     var response = postRocketChatGroupMessage(chatMessage);
     notifyAndClearDraft(chatMessage);
-    return response;
-  }
-
-  /**
-   * Posts a message to the given Rocket.Chat feedback group id and sends out a notification e-mail
-   * via the UserService (because we need to get the user information).
-   *
-   * @param feedbackGroupMessage the message
-   */
-  public MessageResponseDTO postFeedbackGroupMessage(ChatMessage feedbackGroupMessage) {
-    validateFeedbackChatId(feedbackGroupMessage);
-    var response = postRocketChatGroupMessage(feedbackGroupMessage);
-    notifyAndClearDraftForFeedbackGroup(feedbackGroupMessage);
     return response;
   }
 
@@ -138,25 +122,6 @@ public class Messenger {
         : UserRole.ASKER;
   }
 
-  private void notifyAndClearDraftForFeedbackGroup(ChatMessage feedbackGroupMessage) {
-    draftMessageService.deleteDraftMessageIfExist(feedbackGroupMessage.getRcGroupId());
-
-    if (!this.rocketChatSystemUserId.equals(feedbackGroupMessage.getRcUserId())) {
-      liveEventNotificationService.sendLiveEvent(
-          feedbackGroupMessage.getRcGroupId(),
-          authenticatedUser.getAccessToken(),
-          TenantContext.getCurrentTenantOption()
-      );
-    }
-    if (isTrue(feedbackGroupMessage.isSendNotification())) {
-      emailNotificationFacade.sendEmailAboutNewFeedbackMessage(
-          feedbackGroupMessage.getRcGroupId(),
-          TenantContext.getCurrentTenantOption(),
-          authenticatedUser.getAccessToken()
-      );
-    }
-  }
-
   /**
    * Posts a message to the given Rocket.Chat group id
    *
@@ -176,17 +141,6 @@ public class Messenger {
              | RocketChatPostMarkGroupAsReadException
              | CustomCryptoException ex) {
       throw new InternalServerErrorException(ex, LogService::logInternalServerError);
-    }
-  }
-
-  private void validateFeedbackChatId(ChatMessage feedbackMessage) {
-    GetGroupInfoDto groupDto = rocketChatService.getGroupInfo(feedbackMessage.getRcToken(),
-        feedbackMessage.getRcUserId(), feedbackMessage.getRcGroupId());
-
-    if (!groupDto.getGroup().getName().contains(FEEDBACK_GROUP_IDENTIFIER)) {
-      throw new BadRequestException(
-          String.format("Provided Rocket.Chat group ID %s is no feedback chat.",
-              feedbackMessage.getRcGroupId()), LogService::logBadRequest);
     }
   }
 

@@ -51,20 +51,6 @@ class EmailNotificationFacadeAsyncIT {
   }
 
   @Test
-  void sendEmailAboutNewFeedbackMessageShouldRunInAnotherThread() {
-    when(userControllerApi.getApiClient()).thenReturn(apiClient);
-    var threadCount = ManagementFactory.getThreadMXBean().getThreadCount();
-
-    underTest.sendEmailAboutNewFeedbackMessage(
-        RandomStringUtils.randomAlphanumeric(16),
-        Optional.of(easyRandom.nextLong()),
-        null
-    );
-
-    assertEquals(threadCount + 1, ManagementFactory.getThreadMXBean().getThreadCount());
-  }
-
-  @Test
   void sendEmailAboutReassignRequestShouldRunInAnotherThread() {
     when(userControllerApi.getApiClient()).thenReturn(apiClient);
     var threadCount = ManagementFactory.getThreadMXBean().getThreadCount();

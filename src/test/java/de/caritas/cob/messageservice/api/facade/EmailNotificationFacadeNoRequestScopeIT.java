@@ -56,20 +56,6 @@ class EmailNotificationFacadeNoRequestScopeIT {
   }
 
   @Test
-  void sendEmailAboutNewFeedbackMessageShouldNeverCallAuthenticatedUserMethodsWhenAccessTokenGiven() {
-    when(userControllerApi.getApiClient()).thenReturn(apiClient);
-
-    underTest.sendEmailAboutNewFeedbackMessage(
-        RandomStringUtils.randomAlphanumeric(16),
-        Optional.of(easyRandom.nextLong()),
-        RandomStringUtils.randomAlphanumeric(16)
-    );
-
-    verify(authenticatedUser, timeout(1000).times(0))
-        .getAccessToken();
-  }
-
-  @Test
   void sendEmailAboutReassignRequestShouldNeverCallAuthenticatedUserMethodsWhenAccessTokenGiven() {
     when(userControllerApi.getApiClient()).thenReturn(apiClient);
 

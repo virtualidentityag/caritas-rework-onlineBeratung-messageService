@@ -54,19 +54,6 @@ class EmailNotificationFacadeRequestScopeIT {
   }
 
   @Test
-  void sendEmailAboutNewFeedbackMessageShouldCallAuthenticatedUserMethodsWhenAccessTokenMissing() {
-    when(userControllerApi.getApiClient()).thenReturn(apiClient);
-
-    underTest.sendEmailAboutNewFeedbackMessage(
-        RandomStringUtils.randomAlphanumeric(16),
-        Optional.of(easyRandom.nextLong()),
-        null
-    );
-
-    verify(authenticatedUser, timeout(1000)).getAccessToken();
-  }
-
-  @Test
   void sendEmailAboutReassignRequestShouldCallAuthenticatedUserMethodsWhenAccessTokenMissing() {
     when(userControllerApi.getApiClient()).thenReturn(apiClient);
 

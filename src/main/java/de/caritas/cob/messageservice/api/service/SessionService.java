@@ -23,7 +23,7 @@ public class SessionService {
     var userControllerApi = clientFactory.userControllerApi();
     addDefaultHeaders(userControllerApi.getApiClient());
 
-    return userControllerApi.getSessionsForGroupOrFeedbackGroupIds(rcToken, Lists.newArrayList(rcGroupId));
+    return userControllerApi.getSessionsForGroupIds(rcToken, Lists.newArrayList(rcGroupId));
   }
 
   private void addDefaultHeaders(

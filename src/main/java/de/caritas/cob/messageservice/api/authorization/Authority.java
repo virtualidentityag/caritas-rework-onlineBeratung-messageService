@@ -4,7 +4,6 @@ import static de.caritas.cob.messageservice.api.authorization.Authority.Authorit
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.CONSULTANT_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.TECHNICAL_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USER_DEFAULT;
-import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USE_FEEDBACK;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
@@ -24,7 +23,6 @@ public enum Authority {
   ANONYMOUS(Role.ANONYMOUS.getRoleName(), singletonList(ANONYMOUS_DEFAULT)),
   USER(Role.USER.getRoleName(), singletonList(USER_DEFAULT)),
   CONSULTANT(Role.CONSULTANT.getRoleName(), singletonList(CONSULTANT_DEFAULT)),
-  PEER_CONSULTANT(Role.PEER_CONSULTANT.getRoleName(), singletonList(USE_FEEDBACK)),
   TECHNICAL(Role.TECHNICAL.getRoleName(), singletonList(TECHNICAL_DEFAULT));
 
   private final String roleName;
@@ -63,7 +61,6 @@ public enum Authority {
 
     public static final String CONSULTANT_DEFAULT = PREFIX + "CONSULTANT_DEFAULT";
     public static final String USER_DEFAULT = PREFIX + "USER_DEFAULT";
-    public static final String USE_FEEDBACK = PREFIX + "USE_FEEDBACK";
     public static final String TECHNICAL_DEFAULT = PREFIX + "TECHNICAL_DEFAULT";
     public static final String ANONYMOUS_DEFAULT = PREFIX + "ANONYMOUS_DEFAULT";
 
