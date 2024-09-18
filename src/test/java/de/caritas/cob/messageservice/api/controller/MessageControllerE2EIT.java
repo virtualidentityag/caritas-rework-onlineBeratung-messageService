@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,8 +37,6 @@ import de.caritas.cob.messageservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.messageservice.api.model.AliasArgs;
 import de.caritas.cob.messageservice.api.model.AliasMessageDTO;
 import de.caritas.cob.messageservice.api.model.AliasOnlyMessageDTO;
-import de.caritas.cob.messageservice.api.model.ConsultantReassignment;
-import de.caritas.cob.messageservice.api.model.ForwardMessageDTO;
 import de.caritas.cob.messageservice.api.model.MessageDTO;
 import de.caritas.cob.messageservice.api.model.MessageStreamDTO;
 import de.caritas.cob.messageservice.api.model.MessageType;
@@ -68,12 +65,11 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.AfterEach;
@@ -155,7 +151,7 @@ class MessageControllerE2EIT {
 
   private AliasOnlyMessageDTO aliasOnlyMessage;
   private List<MessagesDTO> messages;
-  private ConsultantReassignment consultantReassignment;
+  private AliasArgs consultantReassignment;
   private String messageId;
   private AliasArgs aliasArgs;
   private Message message;
@@ -231,7 +227,7 @@ class MessageControllerE2EIT {
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     var messagesResponse = objectMapper.readValue(response, MessageStreamDTO.class);
     var message = messagesResponse.getMessages().get(1).getMsg(); // 1 due to split before
-    var consultantReassignment = objectMapper.readValue(message, ConsultantReassignment.class);
+    var consultantReassignment = objectMapper.readValue(message, AliasArgs.class);
 
     assertEquals(this.consultantReassignment, consultantReassignment);
     assertGroupCall();
@@ -974,69 +970,6 @@ class MessageControllerE2EIT {
   }
 
   @Test
-  @WithMockUser(authorities = {AuthorityValue.USE_FEEDBACK})
-  void createFeedbackMessageShouldReturnSendMessageResultOnSuccessfulRequest()
-      throws Exception {
-    givenAuthenticatedUser();
-    givenRocketChatSystemUser();
-    givenAFeedbackGroupResponse();
-    var rcFeedbackGroupId = RandomStringUtils.randomAlphabetic(16);
-    givenSuccessfulSendMessageResponse(null, rcFeedbackGroupId);
-    MessageDTO feedbackMessage = createMessage("a feedback message", null);
-    givenAMasterKey();
-
-    mockMvc.perform(
-            post("/messages/feedback/new")
-                .cookie(CSRF_COOKIE)
-                .header(CSRF_HEADER, CSRF_VALUE)
-                .header("rcToken", RandomStringUtils.randomAlphabetic(16))
-                .header("rcUserId", RandomStringUtils.randomAlphabetic(16))
-                .header("rcFeedbackGroupId", rcFeedbackGroupId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedbackMessage))
-        )
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("ts").isNotEmpty())
-        .andExpect(jsonPath("_updatedAt").isNotEmpty())
-        .andExpect(jsonPath("rid", is(rcFeedbackGroupId)))
-        .andExpect(jsonPath("org").doesNotExist())
-        .andExpect(jsonPath("t", is(nullValue())))
-        .andExpect(jsonPath("_id").isNotEmpty());
-
-    var messageRequestPayload = sendMessagePayloadCaptor.getValue().getBody();
-    assertNotNull(messageRequestPayload);
-  }
-
-  @Test
-  @WithMockUser(authorities = {AuthorityValue.USE_FEEDBACK})
-  void forwardMessageShouldReturnSendMessageResultOnSuccessfulRequest()
-      throws Exception {
-    givenAuthenticatedUser();
-    givenRocketChatSystemUser();
-    givenAFeedbackGroupResponse();
-    givenSuccessfulSendMessageResponse("e2e", RC_GROUP_ID);
-    givenAMasterKey();
-    ForwardMessageDTO forwardMessage = createForwardMessage();
-
-    mockMvc.perform(
-            post("/messages/forward")
-                .cookie(CSRF_COOKIE)
-                .header(CSRF_HEADER, CSRF_VALUE)
-                .header("rcToken", RandomStringUtils.randomAlphabetic(16))
-                .header("rcUserId", RandomStringUtils.randomAlphabetic(16))
-                .header("rcGroupId", RC_GROUP_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(forwardMessage))
-        )
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("ts").isNotEmpty())
-        .andExpect(jsonPath("_updatedAt").isNotEmpty())
-        .andExpect(jsonPath("rid", is(RC_GROUP_ID)))
-        .andExpect(jsonPath("t", is("e2e")))
-        .andExpect(jsonPath("_id").isNotEmpty());
-  }
-
-  @Test
   @WithMockUser(authorities = AuthorityValue.CONSULTANT_DEFAULT)
   void saveAliasOnlyMessageShouldReturnBadRequestIfReassignHasNoConsultantId() throws Exception {
     givenAuthenticatedUser();
@@ -1116,9 +1049,10 @@ class MessageControllerE2EIT {
 
     var decryptedMsg = encryptionService.decrypt(sendMessageRequest.getMsg(), RC_GROUP_ID);
     var decryptedConsultantReassignment =
-        objectMapper.readValue(decryptedMsg, ConsultantReassignment.class);
+        objectMapper.readValue(decryptedMsg, AliasArgs.class);
+    AliasArgs args = aliasOnlyMessage.getArgs();
     assertEquals(
-        aliasOnlyMessage.getArgs().getFromConsultantId(),
+        args.getFromConsultantId(),
         decryptedConsultantReassignment.getFromConsultantId()
     );
   }
@@ -1213,7 +1147,7 @@ class MessageControllerE2EIT {
   }
 
   private void givenAMessageWithAnEncryptedConsultantReassignment(String groupId) {
-    consultantReassignment = new ConsultantReassignment();
+    consultantReassignment = new AliasArgs();
     consultantReassignment.setToConsultantId(UUID.randomUUID());
     consultantReassignment.setStatus(ReassignStatus.REQUESTED);
 
@@ -1395,7 +1329,7 @@ class MessageControllerE2EIT {
     var encodedAlias = URLEncoder.encode(aliasString, StandardCharsets.UTF_8);
     message.setAlias(encodedAlias);
 
-    var consultantReassignment = new ConsultantReassignment();
+    var consultantReassignment = new AliasArgs();
     consultantReassignment.setStatus(ReassignStatus.REQUESTED);
     consultantReassignment.setToConsultantId(UUID.randomUUID());
     var msg = objectMapper.writeValueAsString(consultantReassignment);
@@ -1462,7 +1396,7 @@ class MessageControllerE2EIT {
   }
 
   private void givenAnAliasOnlyMessageWithUnsupportedMessage() {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = givenNewAliasOnlyMessage();
     var messageType = easyRandom.nextBoolean()
         ? MessageType.FURTHER_STEPS
         : MessageType.E2EE_ACTIVATED;
@@ -1472,25 +1406,30 @@ class MessageControllerE2EIT {
   private void givenAnAliasOnlyMessageWithSupportedMessage() {
     aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
     aliasOnlyMessage.setMessageType(MessageType.REASSIGN_CONSULTANT);
-    aliasOnlyMessage.getArgs().setStatus(ReassignStatus.REQUESTED);
+    AliasArgs args = aliasOnlyMessage.getArgs();
+    args.setStatus(ReassignStatus.REQUESTED);
   }
 
   private void givenAnAliasOnlyMessageWithSupportedMessageAndEmptyArgs() {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = givenNewAliasOnlyMessage();
     aliasOnlyMessage.setMessageType(MessageType.REASSIGN_CONSULTANT);
     aliasOnlyMessage.setArgs(null);
   }
 
   private void givenAReassignmentEventWithNoConsultantId() {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = givenNewAliasOnlyMessage();
     var args = new AliasArgs();
     args.setStatus(ReassignStatus.REQUESTED);
     aliasOnlyMessage.setArgs(args);
     aliasOnlyMessage.setMessageType(MessageType.REASSIGN_CONSULTANT);
   }
 
+  private AliasOnlyMessageDTO givenNewAliasOnlyMessage() {
+    return new AliasOnlyMessageDTO().args(new AliasArgs());
+  }
+
   private void givenAnAliasOnlyMessage(boolean muteUnmute) {
-    aliasOnlyMessage = easyRandom.nextObject(AliasOnlyMessageDTO.class);
+    aliasOnlyMessage = new AliasOnlyMessageDTO().messageType(MessageType.USER_MUTED).args(new AliasArgs());
     aliasOnlyMessage.setArgs(null);
 
     MessageType messageType;
@@ -1506,18 +1445,6 @@ class MessageControllerE2EIT {
     }
 
     aliasOnlyMessage.setMessageType(messageType);
-  }
-
-  private void givenAFeedbackGroupResponse() {
-    var getGroupInfoDto = new GetGroupInfoDto();
-    var feedbackGroup = new GroupDto();
-    feedbackGroup.setName("feedback chat Akajsdhn");
-    getGroupInfoDto.setGroup(feedbackGroup);
-    var getGroupInfoDtoHttpEntity = new ResponseEntity<>(getGroupInfoDto, HttpStatus.OK);
-    when(
-        restTemplate.exchange(any(URI.class), eq(HttpMethod.GET), any(),
-            eq(GetGroupInfoDto.class))).thenReturn(
-        getGroupInfoDtoHttpEntity);
   }
 
   private MessageDTO createMessage(String text, String type) {
@@ -1536,17 +1463,6 @@ class MessageControllerE2EIT {
     vcm.setInitiatorRcUserId(consultantId);
     vcm.setEventType(EventTypeEnum.IGNORED_CALL);
     return vcm;
-  }
-
-  private ForwardMessageDTO createForwardMessage() {
-    var forwardMessage = new ForwardMessageDTO();
-    forwardMessage.setMessage("plx forward");
-    forwardMessage.setTimestamp(new Date().toString());
-    forwardMessage.setT("e2e");
-    forwardMessage.setUsername("Heinrich");
-    forwardMessage.setRcUserId(RC_USER_ID);
-    forwardMessage.setDisplayName("hk");
-    return forwardMessage;
   }
 
   private void assertGroupCall() {
