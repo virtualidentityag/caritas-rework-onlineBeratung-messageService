@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/compare/v3.0.0...v3.1.0) (2024-12-20)
+
+
+### Features
+
+* enable distributed tracing ([1be10dd](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/1be10dd4790eb607e0807e7a74767e1e6a57e7b2))
+* enable distributed tracing ([41e0a36](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/41e0a36325545fabac25da81ecd277cd1ead6759))
+
+
+### Bug Fixes
+
+* change base docker image ([6b744f0](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/6b744f0fb2481c6c7a3abdb5b6b24c9b64062406))
+* partial commit ([c95d685](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/c95d685c8828788c8f318e3e04815fdd8f58171f))
+* partial commit ([8946113](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/8946113252b0e3fdd649f36782e55e3b7b42735c))
+* unit tests ([ca34c62](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/ca34c627ef6ec864824dc114c148ebca402a76b3))
+* upgrade liquibase, spring boot ([54c5ccc](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/54c5cccd5d3b8faf01e60e13c23bc9631a4e5939))
+* upgrade liquibase, spring boot, added authenticated user config ([2951b87](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/2951b87d0099fe7a0d0ad16bbac811fcfef9adaf))
+
 ## 3.0.0 (2024-06-18)
 
 
