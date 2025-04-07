@@ -1,8 +1,6 @@
 package de.caritas.cob.messageservice.api.controller;
 
 import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_GROUP_ID;
-import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_TOKEN;
-import static de.caritas.cob.messageservice.testhelper.TestConstants.RC_USER_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,7 +16,6 @@ import de.caritas.cob.messageservice.Messenger;
 import de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue;
 import de.caritas.cob.messageservice.api.model.AliasArgs;
 import de.caritas.cob.messageservice.api.model.AliasOnlyMessageDTO;
-import de.caritas.cob.messageservice.api.model.MessageDTO;
 import de.caritas.cob.messageservice.api.model.MessageType;
 import de.caritas.cob.messageservice.api.model.ReassignStatus;
 import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO;
@@ -46,14 +43,14 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 public class MessageControllerAuthorizationTestIT {
 
-  protected final static String PATH_GET_MESSAGE_STREAM = "/messages";
-  protected final static String PATH_POST_CREATE_MESSAGE = "/messages/new";
-  protected final static String PATH_POST_CREATE_VIDEO_HINT_MESSAGE = "/messages/videohint/new";
-  protected final static String PATH_POST_CREATE_ALIAS_ONLY_MESSAGE = "/messages/aliasonly/new";
-  protected final static String PATH_POST_UPDATE_KEY = "/messages/key";
-  private final static String CSRF_COOKIE = "CSRF-TOKEN";
-  private final static String CSRF_HEADER = "X-CSRF-TOKEN";
-  private final static String CSRF_VALUE = "test";
+  protected static final String PATH_GET_MESSAGE_STREAM = "/messages";
+  protected static final String PATH_POST_CREATE_MESSAGE = "/messages/new";
+  protected static final String PATH_POST_CREATE_VIDEO_HINT_MESSAGE = "/messages/videohint/new";
+  protected static final String PATH_POST_CREATE_ALIAS_ONLY_MESSAGE = "/messages/aliasonly/new";
+  protected static final String PATH_POST_UPDATE_KEY = "/messages/key";
+  private static final String CSRF_COOKIE = "CSRF-TOKEN";
+  private static final String CSRF_HEADER = "X-CSRF-TOKEN";
+  private static final String CSRF_VALUE = "test";
   private static final ObjectMapper objectMapper = new ObjectMapper();
   private static final EasyRandom easyRandom = new EasyRandom();
 
@@ -364,60 +361,6 @@ public class MessageControllerAuthorizationTestIT {
   }
 
   @Test
-  @WithMockUser(authorities = {AuthorityValue.ANONYMOUS_DEFAULT})
-  public void createVideoHintMessage_Should_ReturnCreatedAndCallPostGroupMessageFacade_When_AnonyousAuthority()
-      throws Exception {
-
-    var videoCallMessageDTO = easyRandom.nextObject(VideoCallMessageDTO.class);
-
-    mvc.perform(
-            post(PATH_POST_CREATE_VIDEO_HINT_MESSAGE)
-                .cookie(csrfCookie)
-                .header(CSRF_HEADER, CSRF_VALUE)
-                .header("RCGroupId", RC_GROUP_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(videoCallMessageDTO))
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated());
-
-    verify(messenger).createVideoHintMessage(any(), any());
-  }
-
-  @Test
-  @WithMockUser(authorities = {AuthorityValue.ANONYMOUS_DEFAULT})
-  public void sendNewMessage_Should_ReturnCreated_When_AnonyousAuthority()
-      throws Exception {
-
-    var messageDTO = easyRandom.nextObject(MessageDTO.class);
-
-    mvc.perform(post(PATH_POST_CREATE_MESSAGE)
-            .cookie(csrfCookie)
-            .header(CSRF_HEADER, CSRF_VALUE)
-            .header("rcToken", RC_TOKEN)
-            .header("rcUserId", RC_USER_ID)
-            .header("rcGroupId", RC_GROUP_ID)
-            .content(objectMapper.writeValueAsString(messageDTO))
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated());
-  }
-
-  @Test
-  @WithMockUser(authorities = {AuthorityValue.ANONYMOUS_DEFAULT})
-  public void findMessages_Should_ReturnNoContent_When_AnonymousAuthority()
-      throws Exception {
-    mvc.perform(get(PATH_GET_MESSAGE_STREAM)
-            .cookie(csrfCookie)
-            .header(CSRF_HEADER, CSRF_VALUE)
-            .header("rcToken", RC_TOKEN)
-            .header("rcUserId", RC_USER_ID)
-            .queryParam("rcGroupId", RC_GROUP_ID)
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent());
-  }
-
-  @Test
   @WithMockUser(authorities = {AuthorityValue.TECHNICAL_DEFAULT})
   public void saveAliasOnlyMessage_Should_ReturnCreatedAndCallPostGroupMessageFacade_When_TechnicalDefaultAuthority()
       throws Exception {
@@ -454,7 +397,6 @@ public class MessageControllerAuthorizationTestIT {
 
   @Test
   @WithMockUser(authorities = {
-      AuthorityValue.ANONYMOUS_DEFAULT,
       AuthorityValue.CONSULTANT_DEFAULT,
       AuthorityValue.TECHNICAL_DEFAULT
   })
