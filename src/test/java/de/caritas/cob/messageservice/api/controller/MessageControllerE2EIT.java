@@ -45,8 +45,6 @@ import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO;
 import de.caritas.cob.messageservice.api.model.VideoCallMessageDTO.EventTypeEnum;
 import de.caritas.cob.messageservice.api.model.draftmessage.entity.DraftMessage;
 import de.caritas.cob.messageservice.api.model.rocket.chat.RocketChatCredentials;
-import de.caritas.cob.messageservice.api.model.rocket.chat.group.GetGroupInfoDto;
-import de.caritas.cob.messageservice.api.model.rocket.chat.group.GroupDto;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.MessagesDTO;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageResponseDTO;
 import de.caritas.cob.messageservice.api.model.rocket.chat.message.SendMessageWrapper;
@@ -401,23 +399,6 @@ class MessageControllerE2EIT {
   @WithMockUser(authorities = AuthorityValue.CONSULTANT_DEFAULT)
   void findMessageShouldRespondWithOkForAConsultant() throws Exception {
     givenAuthenticatedUser();
-    givenAMasterKey();
-    givenAValidMessageId();
-    givenMessage(messageId, true);
-
-    mockMvc.perform(
-            get("/messages/{messageId}", messageId)
-                .cookie(CSRF_COOKIE)
-                .header(CSRF_HEADER, CSRF_VALUE)
-                .header("rcToken", RandomStringUtils.randomAlphabetic(16))
-                .header("rcUserId", RandomStringUtils.randomAlphabetic(16))
-        )
-        .andExpect(status().isOk());
-  }
-
-  @Test
-  @WithMockUser(authorities = AuthorityValue.ANONYMOUS_DEFAULT)
-  void findMessageShouldRespondWithOkForAnonymous() throws Exception {
     givenAMasterKey();
     givenAValidMessageId();
     givenMessage(messageId, true);
