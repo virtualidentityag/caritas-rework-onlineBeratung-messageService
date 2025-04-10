@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.1](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/compare/v3.1.0...v3.1.1) (2025-04-10)
+
+
+### Bug Fixes
+
+* actions cache version ([d2c1e45](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/commit/d2c1e459351e794d127577d0eaedf1029767d390))
+
 ## [3.1.0](https://github.com/CaritasDeutschland/caritas-onlineBeratung-messageService/compare/v3.0.0...v3.1.0) (2024-12-20)
 
 
