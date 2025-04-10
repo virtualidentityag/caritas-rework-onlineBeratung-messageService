@@ -1,6 +1,5 @@
 package de.caritas.cob.messageservice.api.authorization;
 
-import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.ANONYMOUS_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.CONSULTANT_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.TECHNICAL_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USER_DEFAULT;
@@ -20,7 +19,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Authority {
 
-  ANONYMOUS(Role.ANONYMOUS.getRoleName(), singletonList(ANONYMOUS_DEFAULT)),
   USER(Role.USER.getRoleName(), singletonList(USER_DEFAULT)),
   CONSULTANT(Role.CONSULTANT.getRoleName(), singletonList(CONSULTANT_DEFAULT)),
   TECHNICAL(Role.TECHNICAL.getRoleName(), singletonList(TECHNICAL_DEFAULT));
@@ -62,7 +60,6 @@ public enum Authority {
     public static final String CONSULTANT_DEFAULT = PREFIX + "CONSULTANT_DEFAULT";
     public static final String USER_DEFAULT = PREFIX + "USER_DEFAULT";
     public static final String TECHNICAL_DEFAULT = PREFIX + "TECHNICAL_DEFAULT";
-    public static final String ANONYMOUS_DEFAULT = PREFIX + "ANONYMOUS_DEFAULT";
 
   }
 

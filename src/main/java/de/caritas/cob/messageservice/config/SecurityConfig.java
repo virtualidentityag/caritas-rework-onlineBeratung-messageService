@@ -1,6 +1,5 @@
 package de.caritas.cob.messageservice.config;
 
-import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.ANONYMOUS_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.CONSULTANT_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.TECHNICAL_DEFAULT;
 import static de.caritas.cob.messageservice.api.authorization.Authority.AuthorityValue.USER_DEFAULT;
@@ -71,15 +70,15 @@ public class SecurityConfig implements WebMvcConfigurer {
         .requestMatchers("/messages/key")
         .hasAuthority(TECHNICAL_DEFAULT)
         .requestMatchers("/messages", "/messages/draft", "/messages/videohint/new")
-        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, ANONYMOUS_DEFAULT)
+        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT)
         .requestMatchers(HttpMethod.PATCH, SINGLE_MESSAGE_PATH)
         .hasAnyAuthority(USER_DEFAULT)
         .requestMatchers(HttpMethod.GET, SINGLE_MESSAGE_PATH)
-        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, ANONYMOUS_DEFAULT)
+        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT)
         .requestMatchers(HttpMethod.DELETE, SINGLE_MESSAGE_PATH)
-        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, ANONYMOUS_DEFAULT)
+        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT)
         .requestMatchers("/messages/new")
-        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT, ANONYMOUS_DEFAULT)
+        .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT)
         .requestMatchers("/messages/aliasonly/new")
         .hasAnyAuthority(USER_DEFAULT, CONSULTANT_DEFAULT, TECHNICAL_DEFAULT)
         .requestMatchers("/messages/aliasWithContent/new")
