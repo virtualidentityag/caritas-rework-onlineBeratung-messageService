@@ -38,8 +38,7 @@ paths:
     post:
       tags:
         - message-controller
-      summary: 'Add new Rocket.Chat message [Authorization: Role: user, anonymous, consultant,
-        technical]'
+      summary: 'Add new Rocket.Chat message [Authorization: Role: user, consultant, technical]'
       operationId: createMessage
       parameters:
         - name: rcToken
@@ -86,8 +85,7 @@ paths:
     post:
       tags:
         - message-controller
-      summary: 'Add new Rocket.Chat system video call event message [Authorization: Role: user,
-      anonymous, consultant]'
+      summary: 'Add new Rocket.Chat system video call event message [Authorization: Role: user, consultant]'
       operationId: createVideoHintMessage
       parameters:
         - name: rcGroupId
@@ -122,7 +120,7 @@ paths:
     get:
       tags:
         - message-controller
-      summary: 'Get Rocket.Chat message stream [Authorization: Role: user, anonymous, consultant]'
+      summary: 'Get Rocket.Chat message stream [Authorization: Role: user, consultant]'
       operationId: findMessages
       parameters:
         - name: rcToken
@@ -255,7 +253,7 @@ paths:
       tags:
         - message-controller
       summary: 'Marks a message as deleted, removes its text and its attachment if it exists [Auth: 
-        user, consultant, anonymous]'
+        user, consultant]'
       operationId: deleteMessage
       responses:
         204:
@@ -279,7 +277,7 @@ paths:
     post:
       tags:
         - message-controller
-      summary: 'Save a draft message [Authorization: Role: user, anonymous, consultant]'
+      summary: 'Save a draft message [Authorization: Role: user, consultant]'
       operationId: saveDraftMessage
       parameters:
         - name: rcGroupId
